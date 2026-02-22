@@ -1,0 +1,32 @@
+@baseUrl = http://127.0.0.1:8000/api
+
+### Health Check
+GET http://127.0.0.1:8000/up
+
+### Sincronizar Produtos
+POST @baseUrl/sincronizar/produtos
+Content-Type: application/json
+
+### Sincronizar Preços
+POST @baseUrl/sincronizar/precos
+Content-Type: application/json
+
+### Listar Produtos - Página 1 (10 itens)
+GET @baseUrl/produtos-precos?page=1&per_page=10
+Content-Type: application/json
+
+### Listar Produtos - Página 2 (5 itens)
+GET @baseUrl/produtos-precos?page=2&per_page=5
+Content-Type: application/json
+
+### Listar Produtos - Primeiro registro
+GET @baseUrl/produtos-precos?page=1&per_page=1
+Content-Type: application/json
+
+### Listar Todos (máximo 100)
+GET @baseUrl/produtos-precos?per_page=100
+Content-Type: application/json
+
+### Listar com Limite Customizado
+GET @baseUrl/produtos-precos?page=1&per_page=20
+Content-Type: application/json

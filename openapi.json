@@ -1,0 +1,279 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Sincronização de Produtos e Preços",
+    "description": "Backend PHP Laravel para processamento e sincronização de dados de produtos e preços usando SQL Views",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Suporte",
+      "url": "https://github.com/somosversotech/teste-backend-php"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000",
+      "description": "Servidor Local (Docker)"
+    },
+    {
+      "url": "https://api.producao.com",
+      "description": "Servidor de Produção"
+    }
+  ],
+  "paths": {
+    "/api/sincronizar/produtos": {
+      "post": {
+        "summary": "Sincronizar Produtos",
+        "description": "Executa o processo de transformação e sincronização de dados de produtos_base para produto_insercao",
+        "tags": ["Sincronização"],
+        "responses": {
+          "200": {
+            "description": "Sincronização realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SincronizacaoResponse"
+                },
+                "example": {
+                  "mensagem": "Sincronização de produtos realizada com sucesso",
+                  "inseridos": 3,
+                  "atualizados": 2,
+                  "total_processado": 5
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro durante sincronização",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sincronizar/precos": {
+      "post": {
+        "summary": "Sincronizar Preços",
+        "description": "Executa o processo de transformação e sincronização de dados de precos_base para preco_insercao",
+        "tags": ["Sincronização"],
+        "responses": {
+          "200": {
+            "description": "Sincronização realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SincronizacaoResponse"
+                },
+                "example": {
+                  "mensagem": "Sincronização de preços realizada com sucesso",
+                  "inseridos": 3,
+                  "atualizados": 0,
+                  "total_processado": 3
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro durante sincronização",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/produtos-precos": {
+      "get": {
+        "summary": "Listar Produtos com Preços",
+        "description": "Retorna lista paginada de produtos sincronizados com seus respectivos preços",
+        "tags": ["Consulta"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Número da página (padrão: 1)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Quantidade de registros por página (padrão: 10, máximo: 100)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de produtos com preços",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoPrecosListaResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro ao listar dados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SincronizacaoResponse": {
+        "type": "object",
+        "properties": {
+          "mensagem": {
+            "type": "string",
+            "example": "Sincronização de produtos realizada com sucesso"
+          },
+          "inseridos": {
+            "type": "integer",
+            "example": 3
+          },
+          "atualizados": {
+            "type": "integer",
+            "example": 2
+          },
+          "total_processado": {
+            "type": "integer",
+            "example": 5
+          }
+        }
+      },
+      "ErroResponse": {
+        "type": "object",
+        "properties": {
+          "erro": {
+            "type": "string",
+            "example": "Erro ao sincronizar produtos"
+          },
+          "detalhes": {
+            "type": "string",
+            "example": "Mensagem de erro específica"
+          }
+        }
+      },
+      "ProdutoPreco": {
+        "type": "object",
+        "properties": {
+          "produto_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "sku": {
+            "type": "string",
+            "example": "PROD001"
+          },
+          "nome_normalizado": {
+            "type": "string",
+            "example": "PRODUTO A"
+          },
+          "descricao_normalizada": {
+            "type": "string",
+            "example": "DESCRIÇÃO DO PRODUTO A"
+          },
+          "preco_normalizado": {
+            "type": "number",
+            "format": "double",
+            "example": 100.50
+          },
+          "moeda_normalizada": {
+            "type": "string",
+            "example": "BRL"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00.000000Z"
+          }
+        }
+      },
+      "Paginacao": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "example": 150
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 15
+          },
+          "from": {
+            "type": "integer",
+            "example": 1
+          },
+          "to": {
+            "type": "integer",
+            "example": 10
+          }
+        }
+      },
+      "ProdutoPrecosListaResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProdutoPreco"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Paginacao"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Sincronização",
+      "description": "Endpoints para sincronizar dados"
+    },
+    {
+      "name": "Consulta",
+      "description": "Endpoints para consultar dados sincronizados"
+    }
+  ]
+}
